@@ -1,0 +1,86 @@
+import statistics
+
+def parse_input(line):
+    line = line.replace(',', ' ').strip()
+    parts = line.split()
+    nums = []
+    for p in parts:
+        try:
+            nums.append(float(p))
+        except ValueError:
+            # ข้ามคำที่ไม่ใช่ตัวเลข
+            continue
+    return nums
+
+def compute_stats(values):
+    if not values:
+        return None
+    n = len(values)
+    mn = min(values)
+    mx = max(values)
+    avg = sum(values) / n
+    std = statistics.pstdev(values)
+    return {'count': n, 'min': mn, 'max': mx, 'avg': avg, 'std': std}
+
+def grade_distribution(values):
+    bins = {'A': 0, 'B': 0, 'C': 0, 'D': 0, 'F': 0}
+    for x in values:
+        if x >= 80:
+            bins['A'] += 1
+        elif x >= 70:
+            bins['B'] += 1
+        elif x >= 60:
+            bins['C'] += 1
+        elif x >= 50:
+            bins['D'] += 1
+        else:
+            bins['F'] += 1
+    return bins
+
+def print_results(stats, dist):
+    print("\n--- ผลลัพธ์ ---")
+    print(f"จำนวนข้อมูล: {stats['count']} ค่า")
+    print(f"ต่ำสุด: {stats['min']:.2f}")
+    print(f"สูงสุด: {stats['max']:.2f}")
+    print(f"ค่าเฉลี่ย: {stats['avg']:.2f}")
+    print(f"ส่วนเบี่ยงเบนมาตรฐาน (Population): {stats['std']:.2f}\n")
+
+    print("การแจกแจงเกรด (A >=80, B 70-79, C 60-69, D 50-59, F <50):")
+    for k in ['A', 'B', 'C', 'D', 'F']:
+        print(f"  {k}: {dist[k]} คน")
+
+def main():
+    print("GradeCalc — โปรแกรมคำนวณสถิติคะแนน (พิมพ์ 'done' เพื่อจบการป้อนข้อมูล)\n")
+    values = []
+    while True:
+        try:
+            line = input("> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\n(ยุติการป้อนข้อมูล)")
+            break
+
+        if not line:
+            # ถ้าใส่บรรทัดว่าง ให้ถามต่อ
+            continue
+        if line.lower() in ('done', 'exit'):
+            break
+
+        new_nums = parse_input(line)
+        if not new_nums:
+            print("ไม่พบตัวเลขในบรรทัดนี้ ลองใหม่ได้เลย (เช่น 78, 85, 90)")
+            continue
+
+        values.extend(new_nums)
+        print(f"(เก็บแล้วรวม {len(values)} ค่า) — ป้อนต่อหรือพิมพ์ 'done' เพื่อคำนวณ")
+
+    if not values:
+        print("ไม่มีคะแนนให้คำนวณ ขอบคุณที่ใช้โปรแกรม")
+        return
+
+    stats = compute_stats(values)
+    dist = grade_distribution(values)
+    print_results(stats, dist)
+    print("\nขอบคุณที่ใช้ GradeCalc — หากต้องการทดสอบชุดใหม่ รันโปรแกรมอีกครั้ง")
+
+if __name__ == '__main__':
+    main()
